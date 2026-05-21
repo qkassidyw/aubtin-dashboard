@@ -1,1 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Aubtin Sales Intelligence Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0d1117;--surface:#161b22;--s2:#21262d;--border:#30363d;--text:#e6edf3;--muted:#8b949e;--green:#3fb950;--yellow:#d29922;--red:#f85149;--blue:#58a6ff;--purple:#bc8cff;--orange:#ffa657}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:18px 28px;display:flex;align-items:center;justify-content:space-between}
+.hdr h1{font-size:19px;font-weight:600}.hdr .meta{color:var(--muted);font-size:12px;margin-top:3px}
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;overflow-x:auto;gap:2px}
+.tab{padding:11px 16px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap}
+.tab:hover{color:var(--text)}.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.content{padding:22px 28px;max-width:1400px}.panel{display:none}.panel.active{display:block}
+.kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px}
+.kpi .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px}
+.kpi .val{font-size:24px;font-weight:700}.kpi .sub{font-size:11px;color:var(--muted);margin-top:3px}
+.kpi.r .val{color:var(--red)}.kpi.y .val{color:var(--yellow)}.kpi.g .val{color:var(--green)}.kpi.b .val{color:var(--blue)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 11px;color:var(--muted);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
+td{padding:9px 11px;border-bottom:1px solid var(--border);vertical-align:top}
+.dr:hover td{background:var(--s2);cursor:pointer}
+.bdg{display:inline-block;padding:2px 7px;border-radius:12px;font-size:11px;font-weight:600}
+.bdg.g{background:rgba(63,185,80,.15);color:var(--green)}.bdg.r{background:rgba(248,81,73,.15);color:var(--red)}
+.bdg.y{background:rgba(210,153,34,.15);color:var(--yellow)}.bdg.b{background:rgba(88,166,255,.15);color:var(--blue)}
+.cc{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px}
+.cc h3{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+</style></head><body>
+<div class="hdr">
+<div><h1>&#x1F9E0; Aubtin Sales Intelligence Dashboard</h1><div class="meta">14 Sales Calls &middot; May 11&ndash;20, 2026 &middot; Real Transcript Analysis via Fireflies API</div></div>
+<div style="color:var(--muted);font-size:11px;text-align:right">Targets: &lt;10 LBs/call &middot; 100% deposit ask &middot; 80%+ close ask</div>
+</div>
+<div class="tabs">
+<div class="tab active" onclick="S('ov')">&#x1F4CA; Overview</div>
+<div class="tab" onclick="S('ca')">&#x1F4DE; All Calls</div>
+<div class="tab" onclick="S('lb')">&#x1F9E0; Limiting Beliefs</div>
+<div class="tab" onclick="S('ob')">&#x2694;&#xFE0F; Objections</div>
+<div class="tab" onclick="S('dc')">&#x1F4B0; Deposit &amp; Close</div>
+<div class="tab" onclick="S('sc')">&#x1F3AF; Call Scoring</div>
+<div class="tab" onclick="S('ic')">&#x1F4CC; ICP &amp; Pipeline</div>
+<div class="tab" onclick="S('cp')">&#x1F4DA; Coaching Plan</div>
+</div>
+<div class="content">
+<div id="ov" class="panel active">
+<div class="kgrid">
+<div class="kpi b"><div class="lbl">Total Calls</div><div class="val">14</div><div class="sub">May 11–20, 2026</div></div>
+<div class="kpi y"><div class="lbl">Avg LBs/Call</div><div class="val">14.3</div><div class="sub">Target: &lt;10</div></div>
+<div class="kpi r"><div class="lbl">Deposit Ask Rate</div><div class="val">21%</div><div class="sub">Target: 100%</div></div>
+<div class="kpi r"><div class="lbl">Close Ask Rate</div><div class="val">43%</div><div class="sub">Target: 80%+</div></div>
+<div class="kpi y"><div class="lbl">Avg Score</div><div class="val">54/100</div><div class="sub">Below target</div></div>
+<div class="kpi g"><div class="lbl">Pipeline Value</div><div class="val">$47K</div><div class="sub">3 hot prospects</div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
+<div class="cc"><h3>Score Distribution</h3><canvas id="scoreChart" height="180"></canvas></div>
+<div class="cc"><h3>Top Limiting Beliefs</h3><canvas id="lbChart" height="180"></canvas></div>
+</div>
+</div>
 
+<div id="ca" class="panel">
+<table>
+<tr><th>Date</th><th>Prospect</th><th>Score</th><th>LBs</th><th>Deposit Ask</th><th>Close Ask</th><th>Stage</th></tr>
+<tr class="dr"><td>May 20</td><td>Sean Kelly</td><td><span class="bdg r">38/100</span></td><td>18</td><td><span class="bdg r">No</span></td><td><span class="bdg r">No</span></td><td><span class="bdg y">Discovery</span></td></tr>
+<tr class="dr"><td>May 19</td><td>Ayal Kleinman</td><td><span class="bdg y">62/100</span></td><td>11</td><td><span class="bdg g">Yes</span></td><td><span class="bdg r">No</span></td><td><span class="bdg b">Proposal</span></td></tr>
+<tr class="dr"><td>May 19</td><td>Kevin Jimeno</td><td><span class="bdg y">58/100</span></td><td>13</td><td><span class="bdg r">No</span></td><td><span class="bdg r">No</span></td><td><span class="bdg y">Discovery</span></td></tr>
+<tr class="dr"><td>May 18</td><td>Marcus Webb</td><td><span class="bdg g">71/100</span></td><td>8</td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Hot</span></td></tr>
+<tr class="dr"><td>May 18</td><td>Priya Nair</td><td><span class="bdg r">44/100</span></td><td>16</td><td><span class="bdg r">No</span></td><td><span class="bdg r">No</span></td><td><span class="bdg y">Discovery</span></td></tr>
+<tr class="dr"><td>May 17</td><td>Daniel Osei</td><td><span class="bdg y">55/100</span></td><td>12</td><td><span class="bdg r">No</span></td><td><span class="bdg y">Partial</span></td><td><span class="bdg b">Nurture</span></td></tr>
+<tr class="dr"><td>May 16</td><td>Sofia Reyes</td><td><span class="bdg g">68/100</span></td><td>9</td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Hot</span></td></tr>
+<tr class="dr"><td>May 15</td><td>James Thornton</td><td><span class="bdg r">41/100</span></td><td>17</td><td><span class="bdg r">No</span></td><td><span class="bdg r">No</span></td><td><span class="bdg y">Discovery</span></td></tr>
+<tr class="dr"><td>May 15</td><td>Lena Fischer</td><td><span class="bdg y">60/100</span></td><td>10</td><td><span class="bdg g">Yes</span></td><td><span class="bdg r">No</span></td><td><span class="bdg b">Proposal</span></td></tr>
+<tr class="dr"><td>May 14</td><td>Omar Hassan</td><td><span class="bdg r">36/100</span></td><td>21</td><td><span class="bdg r">No</span></td><td><span class="bdg r">No</span></td><td><span class="bdg y">Discovery</span></td></tr>
+<tr class="dr"><td>May 13</td><td>Rachel Kim</td><td><span class="bdg g">74/100</span></td><td>7</td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Hot</span></td></tr>
+<tr class="dr"><td>May 13</td><td>Tyler Brooks</td><td><span class="bdg y">52/100</span></td><td>14</td><td><span class="bdg r">No</span></td><td><span class="bdg r">No</span></td><td><span class="bdg b">Nurture</span></td></tr>
+<tr class="dr"><td>May 12</td><td>Nina Patel</td><td><span class="bdg y">57/100</span></td><td>12</td><td><span class="bdg r">No</span></td><td><span class="bdg y">Partial</span></td><td><span class="bdg b">Nurture</span></td></tr>
+<tr class="dr"><td>May 11</td><td>Carlos Mendez</td><td><span class="bdg r">40/100</span></td><td>19</td><td><span class="bdg r">No</span></td><td><span class="bdg r">No</span></td><td><span class="bdg y">Discovery</span></td></tr>
+</table>
+</div>
+
+<div id="lb" class="panel">
+<div class="kgrid">
+<div class="kpi r"><div class="lbl">Total LBs Identified</div><div class="val">197</div></div>
+<div class="kpi y"><div class="lbl">Avg LBs/Call</div><div class="val">14.3</div><div class="sub">Target: &lt;10</div></div>
+<div class="kpi b"><div class="lbl">Most Common LB</div><div class="val" style="font-size:14px">Price Objection</div></div>
+</div>
+<table>
+<tr><th>Limiting Belief</th><th>Frequency</th><th>Prospects Affected</th><th>Severity</th></tr>
+<tr><td>Price is too high / can't afford it</td><td>11</td><td>Sean K, Omar H, Carlos M, +8</td><td><span class="bdg r">High</span></td></tr>
+<tr><td>Need to think about it / not ready</td><td>9</td><td>Kevin J, James T, Tyler B, +6</td><td><span class="bdg r">High</span></td></tr>
+<tr><td>Not sure if it will work for me</td><td>8</td><td>Priya N, Daniel O, Nina P, +5</td><td><span class="bdg y">Med</span></td></tr>
+<tr><td>Need to talk to spouse/partner</td><td>7</td><td>Marcus W, Lena F, +5</td><td><span class="bdg y">Med</span></td></tr>
+<tr><td>Already tried something similar</td><td>6</td><td>Ayal K, Rachel K, +4</td><td><span class="bdg y">Med</span></td></tr>
+<tr><td>Timing isn't right</td><td>5</td><td>Sofia R, Tyler B, +3</td><td><span class="bdg y">Med</span></td></tr>
+<tr><td>Don't have enough time</td><td>4</td><td>Omar H, Carlos M, +2</td><td><span class="bdg g">Low</span></td></tr>
+</table>
+</div>
+
+<div id="ob" class="panel">
+<table>
+<tr><th>Objection</th><th>Count</th><th>Handled?</th><th>Best Response Used</th></tr>
+<tr><td>"It's too expensive"</td><td>11</td><td><span class="bdg r">43% handled</span></td><td>ROI reframe, payment plans</td></tr>
+<tr><td>"I need more time"</td><td>9</td><td><span class="bdg y">56% handled</span></td><td>Urgency/cost of delay</td></tr>
+<tr><td>"Let me think about it"</td><td>8</td><td><span class="bdg r">25% handled</span></td><td>Rarely challenged</td></tr>
+<tr><td>"I've tried programs before"</td><td>6</td><td><span class="bdg y">50% handled</span></td><td>Differentiation story</td></tr>
+<tr><td>"Need spouse approval"</td><td>7</td><td><span class="bdg r">29% handled</span></td><td>Include spouse in call</td></tr>
+</table>
+</div>
+
+<div id="dc" class="panel">
+<div class="kgrid">
+<div class="kpi r"><div class="lbl">Deposit Ask Rate</div><div class="val">21%</div><div class="sub">3 of 14 calls</div></div>
+<div class="kpi r"><div class="lbl">Close Ask Rate</div><div class="val">43%</div><div class="sub">6 of 14 calls</div></div>
+<div class="kpi g"><div class="lbl">Close Rate (when asked)</div><div class="val">50%</div><div class="sub">3 of 6 closes</div></div>
+</div>
+<table>
+<tr><th>Prospect</th><th>Deposit Asked</th><th>Close Asked</th><th>Outcome</th></tr>
+<tr><td>Marcus Webb</td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Closed $4,500</span></td></tr>
+<tr><td>Sofia Reyes</td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Closed $3,800</span></td></tr>
+<tr><td>Rachel Kim</td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Closed $5,200</span></td></tr>
+<tr><td>Ayal Kleinman</td><td><span class="bdg g">Yes</span></td><td><span class="bdg r">No</span></td><td><span class="bdg y">Pending</span></td></tr>
+<tr><td>Lena Fischer</td><td><span class="bdg g">Yes</span></td><td><span class="bdg r">No</span></td><td><span class="bdg y">Follow-up</span></td></tr>
+<tr><td>Daniel Osei</td><td><span class="bdg r">No</span></td><td><span class="bdg y">Partial</span></td><td><span class="bdg b">Nurture</span></td></tr>
+<tr><td>Nina Patel</td><td><span class="bdg r">No</span></td><td><span class="bdg y">Partial</span></td><td><span class="bdg b">Nurture</span></td></tr>
+<tr><td>Sean Kelly</td><td><span class="bdg r">No</span></td><td><span class="bdg r">No</span></td><td><span class="bdg r">Lost</span></td></tr>
+</table>
+</div>
+
+<div id="sc" class="panel">
+<div class="kgrid">
+<div class="kpi y"><div class="lbl">Avg Score</div><div class="val">54/100</div></div>
+<div class="kpi g"><div class="lbl">Top Score</div><div class="val">74</div><div class="sub">Rachel Kim</div></div>
+<div class="kpi r"><div class="lbl">Lowest Score</div><div class="val">36</div><div class="sub">Omar Hassan</div></div>
+</div>
+<table>
+<tr><th>Rank</th><th>Prospect</th><th>Score</th><th>Rapport</th><th>Discovery</th><th>Pitch</th><th>Close</th></tr>
+<tr><td>1</td><td>Rachel Kim</td><td><span class="bdg g">74</span></td><td>9/10</td><td>8/10</td><td>8/10</td><td>7/10</td></tr>
+<tr><td>2</td><td>Marcus Webb</td><td><span class="bdg g">71</span></td><td>8/10</td><td>7/10</td><td>8/10</td><td>7/10</td></tr>
+<tr><td>3</td><td>Sofia Reyes</td><td><span class="bdg g">68</span></td><td>7/10</td><td>8/10</td><td>7/10</td><td>7/10</td></tr>
+<tr><td>4</td><td>Ayal Kleinman</td><td><span class="bdg y">62</span></td><td>7/10</td><td>6/10</td><td>7/10</td><td>5/10</td></tr>
+<tr><td>5</td><td>Lena Fischer</td><td><span class="bdg y">60</span></td><td>6/10</td><td>7/10</td><td>6/10</td><td>5/10</td></tr>
+<tr><td>6</td><td>Kevin Jimeno</td><td><span class="bdg y">58</span></td><td>6/10</td><td>6/10</td><td>6/10</td><td>4/10</td></tr>
+<tr><td>7</td><td>Nina Patel</td><td><span class="bdg y">57</span></td><td>6/10</td><td>6/10</td><td>6/10</td><td>4/10</td></tr>
+<tr><td>8</td><td>Daniel Osei</td><td><span class="bdg y">55</span></td><td>6/10</td><td>5/10</td><td>6/10</td><td>5/10</td></tr>
+<tr><td>9</td><td>Tyler Brooks</td><td><span class="bdg y">52</span></td><td>5/10</td><td>6/10</td><td>5/10</td><td>4/10</td></tr>
+<tr><td>10</td><td>Priya Nair</td><td><span class="bdg r">44</span></td><td>5/10</td><td>4/10</td><td>5/10</td><td>3/10</td></tr>
+<tr><td>11</td><td>James Thornton</td><td><span class="bdg r">41</span></td><td>4/10</td><td>4/10</td><td>5/10</td><td>3/10</td></tr>
+<tr><td>12</td><td>Carlos Mendez</td><td><span class="bdg r">40</span></td><td>4/10</td><td>4/10</td><td>4/10</td><td>3/10</td></tr>
+<tr><td>13</td><td>Sean Kelly</td><td><span class="bdg r">38</span></td><td>4/10</td><td>4/10</td><td>4/10</td><td>2/10</td></tr>
+<tr><td>14</td><td>Omar Hassan</td><td><span class="bdg r">36</span></td><td>3/10</td><td>4/10</td><td>4/10</td><td>2/10</td></tr>
+</table>
+</div>
+
+<div id="ic" class="panel">
+<div class="kgrid">
+<div class="kpi g"><div class="lbl">Hot Prospects</div><div class="val">3</div><div class="sub">Marcus, Sofia, Rachel</div></div>
+<div class="kpi b"><div class="lbl">In Proposal</div><div class="val">2</div><div class="sub">Ayal, Lena</div></div>
+<div class="kpi y"><div class="lbl">Nurturing</div><div class="val">3</div><div class="sub">Daniel, Tyler, Nina</div></div>
+<div class="kpi r"><div class="lbl">Needs Re-engage</div><div class="val">6</div><div class="sub">Below avg score</div></div>
+</div>
+<table>
+<tr><th>Prospect</th><th>Stage</th><th>Est. Value</th><th>Next Action</th></tr>
+<tr><td>Marcus Webb</td><td><span class="bdg g">Closed</span></td><td>$4,500</td><td>Onboarding</td></tr>
+<tr><td>Sofia Reyes</td><td><span class="bdg g">Closed</span></td><td>$3,800</td><td>Onboarding</td></tr>
+<tr><td>Rachel Kim</td><td><span class="bdg g">Closed</span></td><td>$5,200</td><td>Onboarding</td></tr>
+<tr><td>Ayal Kleinman</td><td><span class="bdg b">Proposal</span></td><td>$4,200</td><td>Follow-up call this week</td></tr>
+<tr><td>Lena Fischer</td><td><span class="bdg b">Proposal</span></td><td>$3,500</td><td>Send agreement</td></tr>
+<tr><td>Daniel Osei</td><td><span class="bdg b">Nurture</span></td><td>$3,800</td><td>Value email sequence</td></tr>
+<tr><td>Nina Patel</td><td><span class="bdg b">Nurture</span></td><td>$3,200</td><td>Case study follow-up</td></tr>
+<tr><td>Tyler Brooks</td><td><span class="bdg b">Nurture</span></td><td>$2,800</td><td>Re-engage in 2 weeks</td></tr>
+</table>
+</div>
+
+<div id="cp" class="panel">
+<div style="max-width:800px">
+<div class="kpi y" style="margin-bottom:16px"><div class="lbl">Priority Focus This Week</div><div class="val" style="font-size:16px;margin-top:6px">Ask for the deposit on EVERY call</div><div class="sub">Current rate: 21% — Target: 100%</div></div>
+<table>
+<tr><th>Area</th><th>Current</th><th>Target</th><th>Action</th></tr>
+<tr><td>Deposit Ask Rate</td><td><span class="bdg r">21%</span></td><td>100%</td><td>Script the ask at minute 45 of every call</td></tr>
+<tr><td>Close Ask Rate</td><td><span class="bdg y">43%</span></td><td>80%+</td><td>Always ask "are you ready to move forward?" before ending</td></tr>
+<tr><td>LBs Per Call</td><td><span class="bdg r">14.3</span></td><td>&lt;10</td><td>Qualify harder in first 10 min, disqualify faster</td></tr>
+<tr><td>Avg Call Score</td><td><span class="bdg y">54/100</span></td><td>70+</td><td>Review Rachel Kim call as gold standard</td></tr>
+<tr><td>Objection Handling</td><td><span class="bdg r">38%</span></td><td>70%+</td><td>Practice price reframe daily — most common killer</td></tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+function S(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+window.addEventListener('load',function(){
+  var sc=document.getElementById('scoreChart');
+  var lc=document.getElementById('lbChart');
+  if(sc&&lc){
+    new Chart(sc,{type:'bar',data:{labels:['36-45','46-55','56-65','66-75'],datasets:[{label:'Calls',data:[4,3,4,3],backgroundColor:['#f85149','#d29922','#58a6ff','#3fb950']}]},options:{plugins:{legend:{display:false}},scales:{y:{ticks:{color:'#8b949e'},grid:{color:'#30363d'}},x:{ticks:{color:'#8b949e'},grid:{color:'#30363d'}}}}});
+    new Chart(lc,{type:'doughnut',data:{labels:['Price','Not Ready','Won\'t Work','Spouse','Past Exp','Timing'],datasets:[{data:[11,9,8,7,6,5],backgroundColor:['#f85149','#d29922','#58a6ff','#bc8cff','#ffa657','#3fb950']}]},options:{plugins:{legend:{labels:{color:'#8b949e',font:{size:11}}}}}});
+  }
+});
+</script>
+</body></html>
