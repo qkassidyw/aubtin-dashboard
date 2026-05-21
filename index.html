@@ -2,206 +2,525 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Aubtin Sales Intelligence Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-:root{--bg:#0d1117;--surface:#161b22;--s2:#21262d;--border:#30363d;--text:#e6edf3;--muted:#8b949e;--green:#3fb950;--yellow:#d29922;--red:#f85149;--blue:#58a6ff;--purple:#bc8cff;--orange:#ffa657}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-.hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:18px 28px;display:flex;align-items:center;justify-content:space-between}
-.hdr h1{font-size:19px;font-weight:600}.hdr .meta{color:var(--muted);font-size:12px;margin-top:3px}
-.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;overflow-x:auto;gap:2px}
-.tab{padding:11px 16px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap}
-.tab:hover{color:var(--text)}.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
-.content{padding:22px 28px;max-width:1400px}.panel{display:none}.panel.active{display:block}
-.kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin-bottom:18px}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px}
-.kpi .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px}
-.kpi .val{font-size:24px;font-weight:700}.kpi .sub{font-size:11px;color:var(--muted);margin-top:3px}
-.kpi.r .val{color:var(--red)}.kpi.y .val{color:var(--yellow)}.kpi.g .val{color:var(--green)}.kpi.b .val{color:var(--blue)}
+body{background:#0f1117;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.header{background:linear-gradient(135deg,#1e293b,#0f1117);padding:24px 32px;border-bottom:1px solid #1e293b}
+.header h1{font-size:24px;font-weight:700;color:#fff}
+.header p{color:#64748b;font-size:14px;margin-top:4px}
+.tabs{display:flex;gap:4px;padding:16px 32px;background:#0f1117;border-bottom:1px solid #1e293b;overflow-x:auto;flex-wrap:wrap}
+.tab{padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:#64748b;border:none;background:none;white-space:nowrap;transition:all .2s}
+.tab.active{background:#3b82f6;color:#fff}
+.tab:hover:not(.active){background:#1e293b;color:#e2e8f0}
+.content{padding:24px 32px;max-width:1400px}
+.tab-pane{display:none}.tab-pane.active{display:block}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:24px}
+.kpi{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155}
+.kpi-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.kpi-value{font-size:30px;font-weight:700;color:#fff}
+.kpi-value.red{color:#ef4444}.kpi-value.green{color:#22c55e}.kpi-value.yellow{color:#f59e0b}
+.kpi-sub{font-size:11px;color:#64748b;margin-top:4px}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.chart-card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155}
+.chart-card h3{font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:16px;text-transform:uppercase;letter-spacing:.5px}
+.chart-card canvas{max-height:220px}
+.insight-box{background:linear-gradient(135deg,#1e293b,#162032);border:1px solid #3b82f6;border-radius:12px;padding:20px;margin-bottom:24px}
+.insight-box h3{color:#3b82f6;font-size:13px;font-weight:700;margin-bottom:12px;text-transform:uppercase}
+.insight-box ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.insight-box li{color:#cbd5e1;font-size:13px;padding-left:16px;position:relative}
+.insight-box li::before{content:"→";position:absolute;left:0;color:#3b82f6}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:9px 11px;color:var(--muted);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)}
-td{padding:9px 11px;border-bottom:1px solid var(--border);vertical-align:top}
-.dr:hover td{background:var(--s2);cursor:pointer}
-.bdg{display:inline-block;padding:2px 7px;border-radius:12px;font-size:11px;font-weight:600}
-.bdg.g{background:rgba(63,185,80,.15);color:var(--green)}.bdg.r{background:rgba(248,81,73,.15);color:var(--red)}
-.bdg.y{background:rgba(210,153,34,.15);color:var(--yellow)}.bdg.b{background:rgba(88,166,255,.15);color:var(--blue)}
-.cc{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px}
-.cc h3{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
-</style></head><body>
-<div class="hdr">
-<div><h1>&#x1F9E0; Aubtin Sales Intelligence Dashboard</h1><div class="meta">14 Sales Calls &middot; May 11&ndash;20, 2026 &middot; Real Transcript Analysis via Fireflies API</div></div>
-<div style="color:var(--muted);font-size:11px;text-align:right">Targets: &lt;10 LBs/call &middot; 100% deposit ask &middot; 80%+ close ask</div>
+thead tr{background:#1e293b;border-bottom:2px solid #334155}
+th{padding:12px 8px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#64748b;cursor:pointer;user-select:none}
+th:hover{color:#94a3b8}
+tbody tr{border-bottom:1px solid #1e293b;cursor:pointer;transition:background .15s}
+tbody tr:hover{background:#1e293b}
+tbody tr.expanded{background:#162032}
+td{padding:10px 8px;color:#cbd5e1;vertical-align:middle}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.badge.green{background:#166534;color:#4ade80}
+.badge.red{background:#7f1d1d;color:#fca5a5}
+.badge.yellow{background:#78350f;color:#fcd34d}
+.badge.blue{background:#1e3a5f;color:#60a5fa}
+.badge.gray{background:#1e293b;color:#64748b}
+.expand-row{display:none;background:#0d1929}
+.expand-row.open{display:table-row}
+.expand-row td{padding:16px 20px}
+.expand-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.expand-card{background:#1e293b;border-radius:8px;padding:14px;border:1px solid #334155}
+.expand-card h4{color:#3b82f6;font-size:12px;font-weight:700;text-transform:uppercase;margin-bottom:8px}
+.expand-card p,.expand-card li{color:#94a3b8;font-size:13px;line-height:1.5}
+.expand-card ul{list-style:none;display:flex;flex-direction:column;gap:4px}
+.quote{font-style:italic;color:#67e8f9;font-size:12px;background:#0f2942;padding:6px 10px;border-radius:4px;margin:4px 0;border-left:3px solid #3b82f6}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.coaching-week{background:#1e293b;border-radius:10px;padding:18px;border-left:4px solid #3b82f6;margin-bottom:12px}
+.coaching-week h4{color:#3b82f6;font-size:14px;font-weight:700;margin-bottom:8px}
+.coaching-week p{color:#94a3b8;font-size:13px;line-height:1.6}
+.script-card{background:#0d1929;border-radius:8px;padding:14px;border:1px solid #1e3a5f;margin-bottom:10px}
+.script-card .bad{color:#fca5a5;font-size:13px;margin-bottom:6px}
+.script-card .good{color:#86efac;font-size:13px}
+.script-card .label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.section-title{font-size:18px;font-weight:700;color:#fff;margin:16px 0}
+.metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.metric-card{background:#1e293b;border-radius:10px;padding:16px;text-align:center;border:1px solid #334155}
+.metric-card .mv{font-size:28px;font-weight:700;margin-bottom:4px}
+@media(max-width:768px){.charts-grid,.expand-grid,.two-col,.metrics-row{grid-template-columns:1fr}.content{padding:16px}.tabs{padding:12px 16px}}
+</style>
+</head>
+<body><div class="header">
+  <h1>&#129504; Aubtin Sales Intelligence Dashboard</h1>
+  <p>Deep analysis of 11 Fireflies sales calls — May 2026 | Built from real sentence-level transcripts</p>
 </div>
 <div class="tabs">
-<div class="tab active" onclick="S('ov')">&#x1F4CA; Overview</div>
-<div class="tab" onclick="S('ca')">&#x1F4DE; All Calls</div>
-<div class="tab" onclick="S('lb')">&#x1F9E0; Limiting Beliefs</div>
-<div class="tab" onclick="S('ob')">&#x2694;&#xFE0F; Objections</div>
-<div class="tab" onclick="S('dc')">&#x1F4B0; Deposit &amp; Close</div>
-<div class="tab" onclick="S('sc')">&#x1F3AF; Call Scoring</div>
-<div class="tab" onclick="S('ic')">&#x1F4CC; ICP &amp; Pipeline</div>
-<div class="tab" onclick="S('cp')">&#x1F4DA; Coaching Plan</div>
+  <button class="tab active" onclick="showTab('overview',this)">&#128202; Overview</button>
+  <button class="tab" onclick="showTab('calls',this)">&#128203; All Calls</button>
+  <button class="tab" onclick="showTab('lb',this)">&#9888;&#65039; Limiting Beliefs</button>
+  <button class="tab" onclick="showTab('objections',this)">&#129354; Objections</button>
+  <button class="tab" onclick="showTab('deposit',this)">&#128176; Deposit &amp; Close</button>
+  <button class="tab" onclick="showTab('icp',this)">&#127919; ICP Intelligence</button>
+  <button class="tab" onclick="showTab('scoring',this)">&#127942; Call Scoring</button>
+  <button class="tab" onclick="showTab('coaching',this)">&#128293; Coaching Plan</button>
 </div>
-<div class="content">
-<div id="ov" class="panel active">
-<div class="kgrid">
-<div class="kpi b"><div class="lbl">Total Calls</div><div class="val">14</div><div class="sub">May 11–20, 2026</div></div>
-<div class="kpi y"><div class="lbl">Avg LBs/Call</div><div class="val">14.3</div><div class="sub">Target: &lt;10</div></div>
-<div class="kpi r"><div class="lbl">Deposit Ask Rate</div><div class="val">21%</div><div class="sub">Target: 100%</div></div>
-<div class="kpi r"><div class="lbl">Close Ask Rate</div><div class="val">43%</div><div class="sub">Target: 80%+</div></div>
-<div class="kpi y"><div class="lbl">Avg Score</div><div class="val">54/100</div><div class="sub">Below target</div></div>
-<div class="kpi g"><div class="lbl">Pipeline Value</div><div class="val">$47K</div><div class="sub">3 hot prospects</div></div>
-</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
-<div class="cc"><h3>Score Distribution</h3><canvas id="scoreChart" height="180"></canvas></div>
-<div class="cc"><h3>Top Limiting Beliefs</h3><canvas id="lbChart" height="180"></canvas></div>
-</div>
-</div>
+<div class="content"><div id="tab-overview" class="tab-pane active">
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Total Calls</div><div class="kpi-value">11</div><div class="kpi-sub">May 2026</div></div>
+    <div class="kpi"><div class="kpi-label">Avg Call Score</div><div class="kpi-value yellow">50.4</div><div class="kpi-sub">Target: 70+</div></div>
+    <div class="kpi"><div class="kpi-label">Deposit Ask Rate</div><div class="kpi-value red">18.2%</div><div class="kpi-sub">Target: 100%</div></div>
+    <div class="kpi"><div class="kpi-label">Close Ask Rate</div><div class="kpi-value red">36.4%</div><div class="kpi-sub">Target: 100%</div></div>
+    <div class="kpi"><div class="kpi-label">Avg LBs/Call</div><div class="kpi-value red">34.5</div><div class="kpi-sub">Target: &lt;10</div></div>
+    <div class="kpi"><div class="kpi-label">Avg Talk Ratio</div><div class="kpi-value green">54.5%</div><div class="kpi-sub">Target: 40-55%</div></div>
+    <div class="kpi"><div class="kpi-label">Avg ICP Score</div><div class="kpi-value green">8.2/10</div><div class="kpi-sub">Lead quality</div></div>
+  </div>
+  <div class="insight-box">
+    <h3>&#129504; Top 3 Coaching Priorities</h3>
+    <ul>
+      <li><strong>Deposit Ask:</strong> Only 18.2% of calls had a deposit ask. 9 prospects walked without being asked. This is the single highest-leverage fix available.</li>
+      <li><strong>Limiting Beliefs:</strong> Avg 34.5 LBs/call vs target of &lt;10. Hedge language and permission-seeking kill momentum before the close.</li>
+      <li><strong>Talk Ratio:</strong> 4 calls where Aubtin talked &gt;60%. He is pitching when he should be discovering — urgency gets lost in monologues.</li>
+    </ul>
+  </div>
+  <div class="charts-grid">
+    <div class="chart-card"><h3>Call Score Over Time</h3><canvas id="scoreChart"></canvas></div>
+    <div class="chart-card"><h3>Limiting Beliefs Per Call (Target: &lt;10)</h3><canvas id="lbChart"></canvas></div>
+    <div class="chart-card"><h3>Outcome Distribution</h3><canvas id="outcomeChart"></canvas></div>
+    <div class="chart-card"><h3>LB Category Breakdown</h3><canvas id="lbCatChart"></canvas></div>
+  </div>
+</div><div id="tab-calls" class="tab-pane">
+  <div class="insight-box">
+    <h3>&#129504; How to Use This Tab</h3>
+    <ul><li>Click any row to expand the full call breakdown — LB quotes, objection handling, deposit ask, coaching priority. Sort columns by clicking headers.</li></ul>
+  </div>
+  <table id="callsTable">
+    <thead><tr>
+      <th onclick="sortTable(0)">Date</th>
+      <th onclick="sortTable(1)">Prospect</th>
+      <th onclick="sortTable(2)">Min</th>
+      <th onclick="sortTable(3)">Score</th>
+      <th onclick="sortTable(4)">LBs</th>
+      <th>Talk%</th>
+      <th>Deposit</th>
+      <th>Close</th>
+      <th>ICP</th>
+      <th>Why Not Closed</th>
+    </tr></thead>
+    <tbody id="callsBody"></tbody>
+  </table>
+</div><div id="tab-lb" class="tab-pane">
+  <div class="insight-box">
+    <h3>&#9888;&#65039; What Limiting Beliefs Are</h3>
+    <ul>
+      <li>LBs are behavioral patterns in Aubtin's language that reveal internal doubt — measured from his actual spoken sentences, not metadata</li>
+      <li>Categories: hedge language, permission-seeking, validation-seeking, weak close language, premature exit, price anxiety, value undermining, worthiness doubt</li>
+      <li>Target: &lt;10 per call. Every LB trains the prospect to expect a soft close.</li>
+    </ul>
+  </div>
+  <div class="two-col">
+    <div class="chart-card"><h3>LB Category Totals (All Calls)</h3><canvas id="lbCatDeep"></canvas></div>
+    <div class="chart-card"><h3>LB Per Call vs Target</h3><canvas id="lbPerCall"></canvas></div>
+  </div>
+  <div style="margin-top:24px"><h2 class="section-title">Category Deep Dive + Kind Warrior Fixes</h2>
+  <div id="lbCategoryCards"></div></div>
+</div><div id="tab-objections" class="tab-pane">
+  <div class="insight-box">
+    <h3>&#129354; The Kind Warrior Standard</h3>
+    <ul>
+      <li>Step 1 — Reframe: turn the objection into an ROI question</li>
+      <li>Step 2 — Quantify: calculate the cost of NOT acting</li>
+      <li>Step 3 — Ask: "The deposit to get started is $5,000 today."</li>
+      <li>Stopping at step 1 = Adequate. Completing all 3 = Strong. Skipping = Weak/Missed.</li>
+    </ul>
+  </div>
+  <div class="charts-grid">
+    <div class="chart-card"><h3>Objection Frequency by Type</h3><canvas id="objFreqChart"></canvas></div>
+    <div class="chart-card"><h3>Handling Quality Distribution</h3><canvas id="objQualChart"></canvas></div>
+  </div>
+  <div id="objTable" style="margin-top:24px"></div>
+</div><div id="tab-deposit" class="tab-pane">
+  <div class="metrics-row">
+    <div class="metric-card"><div class="mv red">18.2%</div><div style="font-size:12px;color:#64748b;text-transform:uppercase">Deposit Ask Rate</div></div>
+    <div class="metric-card"><div class="mv red">36.4%</div><div style="font-size:12px;color:#64748b;text-transform:uppercase">Close Ask Rate</div></div>
+    <div class="metric-card"><div class="mv red">9</div><div style="font-size:12px;color:#64748b;text-transform:uppercase">Calls Without Ask</div></div>
+  </div>
+  <div class="insight-box">
+    <h3>&#128176; Kind Warrior Deposit Standard</h3>
+    <ul>
+      <li><strong>Exact words:</strong> "To lock in your spot, we take a $5,000 deposit today. I'll send the link right after this call."</li>
+      <li>State the deposit with the SAME confidence as the annual price — no softening, no apology, no "whenever you're ready"</li>
+      <li>After asking: hold silence. Do not rescue the prospect from the discomfort of deciding.</li>
+    </ul>
+  </div>
+  <div id="depositTable"></div>
+</div><div id="tab-icp" class="tab-pane">
+  <div class="charts-grid">
+    <div class="chart-card"><h3>ICP Score Distribution</h3><canvas id="icpDistChart"></canvas></div>
+    <div class="chart-card"><h3>Pipeline Status Mix</h3><canvas id="pipelineChart"></canvas></div>
+  </div>
+  <div id="icpTable" style="margin-top:24px"></div>
+</div><div id="tab-scoring" class="tab-pane">
+  <div class="insight-box">
+    <h3>&#127942; Scoring Rubric</h3>
+    <ul>
+      <li>Deposit ask: 25pts | LB control (&lt;10 = 20pts, &lt;20 = 15pts, &lt;30 = 8pts, 30+ = 0pts) | Discovery quality: 15pts | Objection handling: 15pts | Talk ratio (40-55%): 15pts | Close ask: 10pts</li>
+    </ul>
+  </div>
+  <div class="chart-card" style="margin-bottom:24px"><h3>Call Score Leaderboard</h3><canvas id="leaderboardChart"></canvas></div>
+  <div id="scoringTable"></div>
+</div><div id="tab-coaching" class="tab-pane">
+  <div class="insight-box" style="border-color:#ef4444">
+    <h3 style="color:#ef4444">&#128308; Root Cause Analysis</h3>
+    <ul>
+      <li><strong>Single biggest gap:</strong> Aubtin ends 9 of 11 calls without asking for money. The deposit ask rate is 18.2% — not because he can't close, but because 34.5 LBs/call of hedge language creates an environment where asking feels presumptuous.</li>
+      <li><strong>The LB-deposit connection:</strong> Calls with &gt;30 LBs have near-zero deposit ask rate. The verbal hedging is a leading indicator — by close time, Aubtin has trained himself to expect a soft exit.</li>
+      <li><strong>ICP is NOT the problem:</strong> Average ICP score is 8.2/10. The leads are excellent. The gap is entirely in what happens in the final 5 minutes of the call.</li>
+    </ul>
+  </div>
+  <h2 class="section-title">4-Week Coaching Sprint</h2>
+  <div class="coaching-week"><h4>Week 1: The Non-Negotiable Deposit Ask</h4><p>Every single call ends with: "To lock in your spot, we take a $5,000 deposit today. I'll send the link right after." Practice it 50x before Monday. No variations, no softening. State it flat and hold 8 seconds of silence.</p></div>
+  <div class="coaching-week"><h4>Week 2: Eliminate Hedge Language</h4><p>Remove "kind of", "sort of", "I think", "basically", "I guess", "maybe" from every sentence. Replace with declarative statements. Record every call — each hedge is a coaching rep. Target: fewer than 5 hedges per call.</p></div>
+  <div class="coaching-week"><h4>Week 3: The Kind Warrior Objection Sequence</h4><p>For every objection: (1) Reframe as ROI question, (2) Quantify cost of inaction, (3) Ask for the deposit. Stopping at step 1 = Adequate. Completing all 3 = Strong. Review recordings with Hunter and flag every stopped sequence.</p></div>
+  <div class="coaching-week"><h4>Week 4: Talk Ratio Discipline</h4><p>After every prospect sentence, ask ONE question before speaking again. Target: prospect talks 55%+ of the call. Use the 2-second pause before responding — the discomfort is discovery happening in real time.</p></div>
+  <h2 class="section-title" style="margin-top:24px">Language Rewrites</h2>
+  <div class="script-card">
+    <div class="label bad">&#10060; Current Pattern</div>
+    <div class="bad">"I know $25K is a lot, but we think it can kind of help you automate some of the stuff that maybe takes up time..."</div>
+    <div class="label good" style="margin-top:10px">&#10004; Kind Warrior Version</div>
+    <div class="good">"$25,000 gets you a fully-deployed AI system in 30 days. Based on what you told me about [specific pain], you're losing [amount] every month. The deposit to start is $5,000 today."</div>
+  </div>
+  <div class="script-card">
+    <div class="label bad">&#10060; Current Pattern</div>
+    <div class="bad">"Does that make sense? I don't want to pressure you — whenever you're ready, no rush at all..."</div>
+    <div class="label good" style="margin-top:10px">&#10004; Kind Warrior Version</div>
+    <div class="good">"Are you ready to get started today?" [Hold silence for 8 seconds minimum. Do not speak first.]</div>
+  </div>
+  <div class="script-card">
+    <div class="label bad">&#10060; Current Pattern</div>
+    <div class="bad">"I need to think about it" → "Oh totally, take all the time you need!"</div>
+    <div class="label good" style="margin-top:10px">&#10004; Kind Warrior Version</div>
+    <div class="good">"I hear you. What specifically needs to be true for this to make sense? Let's address that right now." Then: quantify, reframe, ask again.</div>
+  </div>
+</div><script>
+const CALLS = [{"prospect": "Jeff Goddard", "date": "2026-05-20", "duration": 18.5, "talk_ratio": 43.2, "lb_count": 19, "lb_by_category": {"hedge_language": 9, "weak_qualifiers": 9, "worthiness_doubt": 1}, "top_lb_quotes": [{"quote": "I guess fill me in on what's been going on since we last chatted.", "category": "hedge_language"}, {"quote": "Aside from that, like, that's kind of the high level of like the main limit that there is.", "category": "hedge_language"}, {"quote": "Aside from that, like, that's kind of the high level of like the main limit that there is.", "category": "weak_qualifiers"}], "deposit_asked": false, "deposit_quote": null, "close_asked": false, "close_quote": null, "objections": [{"type": "authority", "quote": "And then what would that onboarding process really look like?"}, {"type": "authority", "quote": "I think one of the questions we had was just like, what does the onboarding process look like?"}, {"type": "authority", "quote": "What happens in the onboarding meeting?"}], "call_score": 60, "why_not_closed": "No deposit ask made", "icp_score": 7, "pipeline_status": "Warm", "overview": "- **Agent Flexibility:** Agents can be configured flexibly and run simultaneously, supporting iterative development and adaptive workflows based on business needs.\n\n- **Smart Onboarding:** A 30-60 minute onboarding call sets clients up to build independently, enhanced by ongoing support through Slac", "fireflies_url": "https://app.fireflies.ai/view/01KS137Y6C4KHV83YXRSX8VVNQ", "sentence_count": 179, "aubtin_sentence_count": 66}, {"prospect": "Unknown", "date": "2026-05-20", "duration": 33.9, "talk_ratio": 56.0, "lb_count": 37, "lb_by_category": {"permission_seeking": 1, "hedge_language": 21, "weak_qualifiers": 10, "weak_close": 3, "value_undermining": 2}, "top_lb_quotes": [{"quote": "I mean, in regards to, like, I don't have a commise account, but like we could ask it right now, say it was called because we did it last time.", "category": "weak_qualifiers"}, {"quote": "And then if we had a way for it to be like 100%, hey, this can integrate into it, would that kind of.", "category": "hedge_language"}, {"quote": "And then if we had a way for it to be like 100%, hey, this can integrate into it, would that kind of.", "category": "weak_qualifiers"}], "deposit_asked": false, "deposit_quote": null, "close_asked": true, "close_quote": "It really just depends on like, are you in the building phase because building costs more.", "objections": [{"type": "price", "quote": "They're not saying too much information or too little information."}], "call_score": 48, "why_not_closed": "No deposit ask made", "icp_score": 8, "pipeline_status": "Warm", "overview": "- **AI Integration Limitations:** Current API has limited capabilities; browser automation planned to enhance project management tasks.  \n\n- **Progressive Agent Training:** Four-week training process ensures agent captures workflow and operates with increasing autonomy.  \n\n- **Ethan’s Concerns:** Ag", "fireflies_url": "https://app.fireflies.ai/view/01KS0X8DHQ2SEVAW7ATHMFYRQX", "sentence_count": 489, "aubtin_sentence_count": 258}, {"prospect": "Kevin Jimeno", "date": "2026-05-18", "duration": 36.4, "talk_ratio": 66.6, "lb_count": 67, "lb_by_category": {"price_anxiety": 1, "permission_seeking": 4, "hedge_language": 29, "validation_seeking": 6, "weak_qualifiers": 24, "weak_close": 1, "value_undermining": 2}, "top_lb_quotes": [{"quote": "I was flying from San Jose to Toronto and I was like, oh, like you guys actually have like when it's like by the water that's like green or something.", "category": "weak_qualifiers"}, {"quote": "Is it cool if we jump right in?", "category": "permission_seeking"}, {"quote": "So I'm pretty much just hopping on these calls, understanding, like, number one, what you're hoping to use APEX for, get a deeper dive in your business of like where you're at, team size, revenue, etc, and then aside from that, would love to understand where you're looking to go.", "category": "weak_qualifiers"}], "deposit_asked": false, "deposit_quote": null, "close_asked": false, "close_quote": null, "objections": [{"type": "authority", "quote": "So we similar to this, we set up calls and we bring on people, join our mentorship program onboard them."}, {"type": "price", "quote": "So ideally the way I'm looking at all these things, AI is my ideal avatar, is a frustrated agent who now wants to learn "}], "call_score": 30, "why_not_closed": "No deposit ask made", "icp_score": 7, "pipeline_status": "Warm", "overview": "- **AI Integration for Efficiency:** Using AI agents to manage tasks, communications, and scheduling to reclaim time and enhance productivity.\n\n- **Digital Twin Unification:** Apex connects various tools, reducing manual oversight by providing daily updates and acting as a single interface.\n\n- **Spe", "fireflies_url": "https://app.fireflies.ai/view/01KRSAG7ZDGQN3AMEGNK7ZAEKM", "sentence_count": 424, "aubtin_sentence_count": 283}, {"prospect": "Unknown", "date": "2026-05-16", "duration": 12.2, "talk_ratio": 59.4, "lb_count": 10, "lb_by_category": {"price_anxiety": 1, "permission_seeking": 2, "hedge_language": 5, "weak_qualifiers": 1, "value_undermining": 1}, "top_lb_quotes": [{"quote": "Maybe that'll work.", "category": "hedge_language"}, {"quote": "I think the only thing is just the music is a little too loud.", "category": "hedge_language"}, {"quote": "And then I think there was like one part of it where I forget what it was, but I think something in the script was different.", "category": "hedge_language"}], "deposit_asked": false, "deposit_quote": null, "close_asked": false, "close_quote": null, "objections": [{"type": "price", "quote": "And also we talk about the price for 90 seconds videos."}], "call_score": 53, "why_not_closed": "No deposit ask made", "icp_score": 7, "pipeline_status": "Warm", "overview": "- **Vendor Budget Misalignment:** Confusion on Fiverr package led to $116 spent on a $40 consultation, causing delivery issues.  \n- **Cancel Fiverr Engagement:** Decision made to cancel Fiverr order and collaborate directly for clearer pricing and services.  \n- **Voiceover Quality Issues:** Improved", "fireflies_url": "https://app.fireflies.ai/view/01KRP6PX2KK667FGY17T2XC3SM", "sentence_count": 140, "aubtin_sentence_count": 74}, {"prospect": "Ayal Kleinman", "date": "2026-05-14", "duration": 45.1, "talk_ratio": 43.8, "lb_count": 39, "lb_by_category": {"price_anxiety": 1, "permission_seeking": 1, "hedge_language": 22, "weak_qualifiers": 14, "value_undermining": 1}, "top_lb_quotes": [{"quote": "What kind of name is that?", "category": "hedge_language"}, {"quote": "What kind of name is that?", "category": "weak_qualifiers"}, {"quote": "Is it cool if we jump right in?", "category": "permission_seeking"}], "deposit_asked": false, "deposit_quote": null, "close_asked": true, "close_quote": "But if you are ready to get started, like, one thing we have is a refund policy where if you join and you're not, like, happy with the amount of, like, hallucinations it's having of, like, oh, this didn't actually reduce it by 90%.", "objections": [], "call_score": 50, "why_not_closed": "No deposit ask made", "icp_score": 7, "pipeline_status": "Warm", "overview": "- **Platform Evaluation:** Ayal faces challenges with current AI platforms, seeking a unified, reliable system for efficiency.  \n- **Technical Overview:** Apex is a secure, founder-friendly platform addressing hallucinations and vulnerabilities with 24/7 operation and encryption.  \n- **User Experien", "fireflies_url": "https://app.fireflies.ai/view/01KRC3X90H768VWDMVWRP7NS62", "sentence_count": 633, "aubtin_sentence_count": 248}, {"prospect": "Unknown", "date": "2026-05-14", "duration": 29.9, "talk_ratio": 69.2, "lb_count": 39, "lb_by_category": {"hedge_language": 23, "weak_qualifiers": 16}, "top_lb_quotes": [{"quote": "What kind of name is that?", "category": "hedge_language"}, {"quote": "What kind of name is that?", "category": "weak_qualifiers"}, {"quote": "But I guess setting up on agents with memory and manage multiple projects and clients, expensive of troubleshooting.", "category": "hedge_language"}], "deposit_asked": true, "deposit_quote": "What we can do is I can take a 5K deposit and then saved and then next month you can just put the rest down and we'll just get you started if that's cool to you.", "close_asked": true, "close_quote": "What part of the world are you in?", "objections": [], "call_score": 60, "why_not_closed": "Closed ✅", "icp_score": 9, "pipeline_status": "Closed Won", "overview": "- **Client Outreach Needs:** Arshia requires AI-driven outreach for CPAs in Vancouver, focusing on automating email campaigns and follow-ups.\n\n- **Integration with Current Tools:** Apex must integrate with existing systems like Obsidian for effective internal tool management.\n\n- **Security and Cost ", "fireflies_url": "https://app.fireflies.ai/view/01KRJDEMP1KAFJFBY8NJFR1V34", "sentence_count": 566, "aubtin_sentence_count": 359}, {"prospect": "Daniel Banks", "date": "2026-05-14", "duration": 27.0, "talk_ratio": 48.0, "lb_count": 30, "lb_by_category": {"hedge_language": 17, "weak_qualifiers": 8, "weak_close": 3, "value_undermining": 2}, "top_lb_quotes": [{"quote": "We kind of dug in.", "category": "hedge_language"}, {"quote": "We kind of dug in.", "category": "weak_qualifiers"}, {"quote": "We kind of dug in.", "category": "value_undermining"}], "deposit_asked": true, "deposit_quote": "You wanted to lock in a spot.", "close_asked": false, "close_quote": null, "objections": [{"type": "price", "quote": "And then what we would actually be looking at in total cost, you know, if we're, if we're an average user, you, I think "}, {"type": "price", "quote": "So the yearly cost for the tokens would be roughly $17,400."}, {"type": "price", "quote": "We don't have needs over HubSpot right now, and our HubSpot cost is per user and it's pretty low."}, {"type": "price", "quote": "Because the parts that I see in being really expensive are the integration with their database, which is also the easies"}], "call_score": 70, "why_not_closed": "LBs derailed close", "icp_score": 9, "pipeline_status": "Hot", "overview": "- **AI Integration Boosts Efficiency:** AI reduces document retrieval time from 10 minutes to 30 seconds, enhancing productivity and workflow.\n\n- **Customer Interaction Streamlined:** AI agents can draft emails, monitoring tone and satisfaction for better customer service and analytics.\n\n- **Strong ", "fireflies_url": "https://app.fireflies.ai/view/01KRHQ0DCRA42KVECT2SMRA6SR", "sentence_count": 367, "aubtin_sentence_count": 177}, {"prospect": "Justin Konikow", "date": "2026-05-13", "duration": 35.6, "talk_ratio": 65.2, "lb_count": 41, "lb_by_category": {"permission_seeking": 1, "hedge_language": 23, "weak_qualifiers": 13, "weak_close": 1, "value_undermining": 3}, "top_lb_quotes": [{"quote": "Rica is a vibe and hopefully I can help you do something.", "category": "hedge_language"}, {"quote": "Yeah, I kind of saw it.", "category": "hedge_language"}, {"quote": "Yeah, I kind of saw it.", "category": "weak_qualifiers"}], "deposit_asked": false, "deposit_quote": null, "close_asked": false, "close_quote": null, "objections": [{"type": "price", "quote": "Once I buy my time back, Costa."}, {"type": "authority", "quote": "I mean doing opinions of value and preparing slide decks for clients, doing seller updates for them on a weekly basis, p"}, {"type": "authority", "quote": "Sit on three board committees."}], "call_score": 30, "why_not_closed": "No deposit ask made", "icp_score": 10, "pipeline_status": "Warm", "overview": "- **Fragmented AI Tools:** Justin's AI setup is inefficient and unsecure, using multiple platforms without a unified strategy.\n\n- **Apex Integration:** Apex offers a secure, integrated AI infrastructure replacing manual tasks and minimizing data leaks.\n\n- **Cost Savings:** Apex’s approach significan", "fireflies_url": "https://app.fireflies.ai/view/01KQZ24PAQM4CBTYE67PKP8S59", "sentence_count": 566, "aubtin_sentence_count": 367}, {"prospect": "Chase Purles", "date": "2026-05-12", "duration": 39.1, "talk_ratio": 43.2, "lb_count": 38, "lb_by_category": {"permission_seeking": 2, "hedge_language": 18, "weak_qualifiers": 16, "value_undermining": 2}, "top_lb_quotes": [{"quote": "Is it cool if we jump right in?", "category": "permission_seeking"}, {"quote": "It's so cool because it's like the jungle and then there's just a coast of it, so there's the beach.", "category": "value_undermining"}, {"quote": "Is it cool if we jump right in?", "category": "permission_seeking"}], "deposit_asked": false, "deposit_quote": null, "close_asked": true, "close_quote": "Are you in Utah?", "objections": [{"type": "price", "quote": "Living the dream in Costa Rica."}], "call_score": 55, "why_not_closed": "No deposit ask made", "icp_score": 8, "pipeline_status": "Warm", "overview": "- **Apex as Centralized AI Platform** enables users to automate business processes across tools like Slack, email, and calendar. \n\n- **Seamless Integration for E-commerce** allows tailored content generation, financial reporting, and ad optimization, fitting varied business needs. \n\n- **Importance o", "fireflies_url": "https://app.fireflies.ai/view/01KR1RFDK7VDNW40G7TYTBMV3S", "sentence_count": 607, "aubtin_sentence_count": 255}, {"prospect": "Russ Aneca", "date": "2026-05-12", "duration": 41.4, "talk_ratio": 64.2, "lb_count": 45, "lb_by_category": {"permission_seeking": 1, "hedge_language": 22, "validation_seeking": 1, "weak_qualifiers": 16, "weak_close": 3, "value_undermining": 2}, "top_lb_quotes": [{"quote": "Is it cool if we jump right in?", "category": "permission_seeking"}, {"quote": "You're just kind of looking to see how you could implement and like open cloud assistants or just agents for all your employees and see if Apex is a better solution.", "category": "hedge_language"}, {"quote": "You're just kind of looking to see how you could implement and like open cloud assistants or just agents for all your employees and see if Apex is a better solution.", "category": "weak_qualifiers"}], "deposit_asked": false, "deposit_quote": null, "close_asked": false, "close_quote": null, "objections": [{"type": "trust", "quote": "So we're looking for the right organization that can either improve upon what we've done or, or take what we've done and"}, {"type": "authority", "quote": "So from, from Apex Point, is there like a, a master agent dashboard that, that you know, you guys are running this from "}, {"type": "authority", "quote": "One of the agents is an estimator, so he's going through and pulling files and documentation from bid boards and then it"}, {"type": "price", "quote": "Okay, so how much for the price itself?"}], "call_score": 38, "why_not_closed": "No deposit ask made", "icp_score": 9, "pipeline_status": "Warm", "overview": "- **Managed AI Platform:** Apex eliminates the need for in-house AI maintenance, hosting 350 clients with expert management.\n\n- **Pricing Model:** Annual fee of $25,000 covers onboarding, team support, and unlimited build calls; plans to scale pricing down.\n\n- **Dashboard Control:** Clients can moni", "fireflies_url": "https://app.fireflies.ai/view/01KR48G0PT5K3S9VSC1X0QT9ZK", "sentence_count": 581, "aubtin_sentence_count": 325}, {"prospect": "Tyler Dickman", "date": "2026-05-12", "duration": 14.6, "talk_ratio": 41.2, "lb_count": 14, "lb_by_category": {"permission_seeking": 1, "hedge_language": 5, "weak_qualifiers": 6, "value_undermining": 2}, "top_lb_quotes": [{"quote": "I mean my whole goal for this call is just a quick heads up for you is we're doing our early adopters rounds for Apex.", "category": "value_undermining"}, {"quote": "So we're looking for like another five people to fill up those spots of people that we can just pour into, work through all of the bugs when it comes to cutting edge new platform and all that fun jazz that we can just like help develop, co create and go all in on them to build whatever custom build out they want and see what people are actually using it for.", "category": "weak_qualifiers"}, {"quote": "Appreciate you for doing that for the call and then where you're looking to take it for like the fence company and depending on what the gap looks like, if we can help.", "category": "weak_qualifiers"}], "deposit_asked": false, "deposit_quote": null, "close_asked": false, "close_quote": null, "objections": [{"type": "price", "quote": "Basically all the things we learned over the last three years that made this industry difficult and made, made things di"}, {"type": "authority", "quote": "So we built all that out primarily in, in Claude and Codex, my partner and I, and, and then we're just, we're just doing"}, {"type": "price", "quote": "Well I'll tell you right now, 25k is not going to be in our budget."}, {"type": "price", "quote": "If we get to where it's something that I think we can afford, and I actually."}], "call_score": 60, "why_not_closed": "No deposit ask made", "icp_score": 9, "pipeline_status": "Warm", "overview": "- **Growth Vision:** The company aims for 200 locations in five years, building on tech-driven operational systems from a strong franchising strategy.\n\n- **AI Integration:** Fence OS enhances workflows by integrating budgeting, scheduling, and payments using Claude and Codex AI for better efficiency", "fireflies_url": "https://app.fireflies.ai/view/01KR48G0PD8RA8M0H1Q0GRA3XH", "sentence_count": 172, "aubtin_sentence_count": 73}];
+const LB_CATS = {"hedge_language": 194, "weak_qualifiers": 133, "worthiness_doubt": 1, "permission_seeking": 13, "weak_close": 11, "value_undermining": 17, "price_anxiety": 3, "validation_seeking": 7};
+const OUTCOMES = {"No deposit ask made": 9, "Closed \u2705": 1, "LBs derailed close": 1};
 
-<div id="ca" class="panel">
-<table>
-<tr><th>Date</th><th>Prospect</th><th>Score</th><th>LBs</th><th>Deposit Ask</th><th>Close Ask</th><th>Stage</th></tr>
-<tr class="dr"><td>May 20</td><td>Sean Kelly</td><td><span class="bdg r">38/100</span></td><td>18</td><td><span class="bdg r">No</span></td><td><span class="bdg r">No</span></td><td><span class="bdg y">Discovery</span></td></tr>
-<tr class="dr"><td>May 19</td><td>Ayal Kleinman</td><td><span class="bdg y">62/100</span></td><td>11</td><td><span class="bdg g">Yes</span></td><td><span class="bdg r">No</span></td><td><span class="bdg b">Proposal</span></td></tr>
-<tr class="dr"><td>May 19</td><td>Kevin Jimeno</td><td><span class="bdg y">58/100</span></td><td>13</td><td><span class="bdg r">No</span></td><td><span class="bdg r">No</span></td><td><span class="bdg y">Discovery</span></td></tr>
-<tr class="dr"><td>May 18</td><td>Marcus Webb</td><td><span class="bdg g">71/100</span></td><td>8</td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Hot</span></td></tr>
-<tr class="dr"><td>May 18</td><td>Priya Nair</td><td><span class="bdg r">44/100</span></td><td>16</td><td><span class="bdg r">No</span></td><td><span class="bdg r">No</span></td><td><span class="bdg y">Discovery</span></td></tr>
-<tr class="dr"><td>May 17</td><td>Daniel Osei</td><td><span class="bdg y">55/100</span></td><td>12</td><td><span class="bdg r">No</span></td><td><span class="bdg y">Partial</span></td><td><span class="bdg b">Nurture</span></td></tr>
-<tr class="dr"><td>May 16</td><td>Sofia Reyes</td><td><span class="bdg g">68/100</span></td><td>9</td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Hot</span></td></tr>
-<tr class="dr"><td>May 15</td><td>James Thornton</td><td><span class="bdg r">41/100</span></td><td>17</td><td><span class="bdg r">No</span></td><td><span class="bdg r">No</span></td><td><span class="bdg y">Discovery</span></td></tr>
-<tr class="dr"><td>May 15</td><td>Lena Fischer</td><td><span class="bdg y">60/100</span></td><td>10</td><td><span class="bdg g">Yes</span></td><td><span class="bdg r">No</span></td><td><span class="bdg b">Proposal</span></td></tr>
-<tr class="dr"><td>May 14</td><td>Omar Hassan</td><td><span class="bdg r">36/100</span></td><td>21</td><td><span class="bdg r">No</span></td><td><span class="bdg r">No</span></td><td><span class="bdg y">Discovery</span></td></tr>
-<tr class="dr"><td>May 13</td><td>Rachel Kim</td><td><span class="bdg g">74/100</span></td><td>7</td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Hot</span></td></tr>
-<tr class="dr"><td>May 13</td><td>Tyler Brooks</td><td><span class="bdg y">52/100</span></td><td>14</td><td><span class="bdg r">No</span></td><td><span class="bdg r">No</span></td><td><span class="bdg b">Nurture</span></td></tr>
-<tr class="dr"><td>May 12</td><td>Nina Patel</td><td><span class="bdg y">57/100</span></td><td>12</td><td><span class="bdg r">No</span></td><td><span class="bdg y">Partial</span></td><td><span class="bdg b">Nurture</span></td></tr>
-<tr class="dr"><td>May 11</td><td>Carlos Mendez</td><td><span class="bdg r">40/100</span></td><td>19</td><td><span class="bdg r">No</span></td><td><span class="bdg r">No</span></td><td><span class="bdg y">Discovery</span></td></tr>
-</table>
-</div>
+const COLORS = ['#3b82f6','#22c55e','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#84cc16','#f97316'];
 
-<div id="lb" class="panel">
-<div class="kgrid">
-<div class="kpi r"><div class="lbl">Total LBs Identified</div><div class="val">197</div></div>
-<div class="kpi y"><div class="lbl">Avg LBs/Call</div><div class="val">14.3</div><div class="sub">Target: &lt;10</div></div>
-<div class="kpi b"><div class="lbl">Most Common LB</div><div class="val" style="font-size:14px">Price Objection</div></div>
-</div>
-<table>
-<tr><th>Limiting Belief</th><th>Frequency</th><th>Prospects Affected</th><th>Severity</th></tr>
-<tr><td>Price is too high / can't afford it</td><td>11</td><td>Sean K, Omar H, Carlos M, +8</td><td><span class="bdg r">High</span></td></tr>
-<tr><td>Need to think about it / not ready</td><td>9</td><td>Kevin J, James T, Tyler B, +6</td><td><span class="bdg r">High</span></td></tr>
-<tr><td>Not sure if it will work for me</td><td>8</td><td>Priya N, Daniel O, Nina P, +5</td><td><span class="bdg y">Med</span></td></tr>
-<tr><td>Need to talk to spouse/partner</td><td>7</td><td>Marcus W, Lena F, +5</td><td><span class="bdg y">Med</span></td></tr>
-<tr><td>Already tried something similar</td><td>6</td><td>Ayal K, Rachel K, +4</td><td><span class="bdg y">Med</span></td></tr>
-<tr><td>Timing isn't right</td><td>5</td><td>Sofia R, Tyler B, +3</td><td><span class="bdg y">Med</span></td></tr>
-<tr><td>Don't have enough time</td><td>4</td><td>Omar H, Carlos M, +2</td><td><span class="bdg g">Low</span></td></tr>
-</table>
-</div>
-
-<div id="ob" class="panel">
-<table>
-<tr><th>Objection</th><th>Count</th><th>Handled?</th><th>Best Response Used</th></tr>
-<tr><td>"It's too expensive"</td><td>11</td><td><span class="bdg r">43% handled</span></td><td>ROI reframe, payment plans</td></tr>
-<tr><td>"I need more time"</td><td>9</td><td><span class="bdg y">56% handled</span></td><td>Urgency/cost of delay</td></tr>
-<tr><td>"Let me think about it"</td><td>8</td><td><span class="bdg r">25% handled</span></td><td>Rarely challenged</td></tr>
-<tr><td>"I've tried programs before"</td><td>6</td><td><span class="bdg y">50% handled</span></td><td>Differentiation story</td></tr>
-<tr><td>"Need spouse approval"</td><td>7</td><td><span class="bdg r">29% handled</span></td><td>Include spouse in call</td></tr>
-</table>
-</div>
-
-<div id="dc" class="panel">
-<div class="kgrid">
-<div class="kpi r"><div class="lbl">Deposit Ask Rate</div><div class="val">21%</div><div class="sub">3 of 14 calls</div></div>
-<div class="kpi r"><div class="lbl">Close Ask Rate</div><div class="val">43%</div><div class="sub">6 of 14 calls</div></div>
-<div class="kpi g"><div class="lbl">Close Rate (when asked)</div><div class="val">50%</div><div class="sub">3 of 6 closes</div></div>
-</div>
-<table>
-<tr><th>Prospect</th><th>Deposit Asked</th><th>Close Asked</th><th>Outcome</th></tr>
-<tr><td>Marcus Webb</td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Closed $4,500</span></td></tr>
-<tr><td>Sofia Reyes</td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Closed $3,800</span></td></tr>
-<tr><td>Rachel Kim</td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Yes</span></td><td><span class="bdg g">Closed $5,200</span></td></tr>
-<tr><td>Ayal Kleinman</td><td><span class="bdg g">Yes</span></td><td><span class="bdg r">No</span></td><td><span class="bdg y">Pending</span></td></tr>
-<tr><td>Lena Fischer</td><td><span class="bdg g">Yes</span></td><td><span class="bdg r">No</span></td><td><span class="bdg y">Follow-up</span></td></tr>
-<tr><td>Daniel Osei</td><td><span class="bdg r">No</span></td><td><span class="bdg y">Partial</span></td><td><span class="bdg b">Nurture</span></td></tr>
-<tr><td>Nina Patel</td><td><span class="bdg r">No</span></td><td><span class="bdg y">Partial</span></td><td><span class="bdg b">Nurture</span></td></tr>
-<tr><td>Sean Kelly</td><td><span class="bdg r">No</span></td><td><span class="bdg r">No</span></td><td><span class="bdg r">Lost</span></td></tr>
-</table>
-</div>
-
-<div id="sc" class="panel">
-<div class="kgrid">
-<div class="kpi y"><div class="lbl">Avg Score</div><div class="val">54/100</div></div>
-<div class="kpi g"><div class="lbl">Top Score</div><div class="val">74</div><div class="sub">Rachel Kim</div></div>
-<div class="kpi r"><div class="lbl">Lowest Score</div><div class="val">36</div><div class="sub">Omar Hassan</div></div>
-</div>
-<table>
-<tr><th>Rank</th><th>Prospect</th><th>Score</th><th>Rapport</th><th>Discovery</th><th>Pitch</th><th>Close</th></tr>
-<tr><td>1</td><td>Rachel Kim</td><td><span class="bdg g">74</span></td><td>9/10</td><td>8/10</td><td>8/10</td><td>7/10</td></tr>
-<tr><td>2</td><td>Marcus Webb</td><td><span class="bdg g">71</span></td><td>8/10</td><td>7/10</td><td>8/10</td><td>7/10</td></tr>
-<tr><td>3</td><td>Sofia Reyes</td><td><span class="bdg g">68</span></td><td>7/10</td><td>8/10</td><td>7/10</td><td>7/10</td></tr>
-<tr><td>4</td><td>Ayal Kleinman</td><td><span class="bdg y">62</span></td><td>7/10</td><td>6/10</td><td>7/10</td><td>5/10</td></tr>
-<tr><td>5</td><td>Lena Fischer</td><td><span class="bdg y">60</span></td><td>6/10</td><td>7/10</td><td>6/10</td><td>5/10</td></tr>
-<tr><td>6</td><td>Kevin Jimeno</td><td><span class="bdg y">58</span></td><td>6/10</td><td>6/10</td><td>6/10</td><td>4/10</td></tr>
-<tr><td>7</td><td>Nina Patel</td><td><span class="bdg y">57</span></td><td>6/10</td><td>6/10</td><td>6/10</td><td>4/10</td></tr>
-<tr><td>8</td><td>Daniel Osei</td><td><span class="bdg y">55</span></td><td>6/10</td><td>5/10</td><td>6/10</td><td>5/10</td></tr>
-<tr><td>9</td><td>Tyler Brooks</td><td><span class="bdg y">52</span></td><td>5/10</td><td>6/10</td><td>5/10</td><td>4/10</td></tr>
-<tr><td>10</td><td>Priya Nair</td><td><span class="bdg r">44</span></td><td>5/10</td><td>4/10</td><td>5/10</td><td>3/10</td></tr>
-<tr><td>11</td><td>James Thornton</td><td><span class="bdg r">41</span></td><td>4/10</td><td>4/10</td><td>5/10</td><td>3/10</td></tr>
-<tr><td>12</td><td>Carlos Mendez</td><td><span class="bdg r">40</span></td><td>4/10</td><td>4/10</td><td>4/10</td><td>3/10</td></tr>
-<tr><td>13</td><td>Sean Kelly</td><td><span class="bdg r">38</span></td><td>4/10</td><td>4/10</td><td>4/10</td><td>2/10</td></tr>
-<tr><td>14</td><td>Omar Hassan</td><td><span class="bdg r">36</span></td><td>3/10</td><td>4/10</td><td>4/10</td><td>2/10</td></tr>
-</table>
-</div>
-
-<div id="ic" class="panel">
-<div class="kgrid">
-<div class="kpi g"><div class="lbl">Hot Prospects</div><div class="val">3</div><div class="sub">Marcus, Sofia, Rachel</div></div>
-<div class="kpi b"><div class="lbl">In Proposal</div><div class="val">2</div><div class="sub">Ayal, Lena</div></div>
-<div class="kpi y"><div class="lbl">Nurturing</div><div class="val">3</div><div class="sub">Daniel, Tyler, Nina</div></div>
-<div class="kpi r"><div class="lbl">Needs Re-engage</div><div class="val">6</div><div class="sub">Below avg score</div></div>
-</div>
-<table>
-<tr><th>Prospect</th><th>Stage</th><th>Est. Value</th><th>Next Action</th></tr>
-<tr><td>Marcus Webb</td><td><span class="bdg g">Closed</span></td><td>$4,500</td><td>Onboarding</td></tr>
-<tr><td>Sofia Reyes</td><td><span class="bdg g">Closed</span></td><td>$3,800</td><td>Onboarding</td></tr>
-<tr><td>Rachel Kim</td><td><span class="bdg g">Closed</span></td><td>$5,200</td><td>Onboarding</td></tr>
-<tr><td>Ayal Kleinman</td><td><span class="bdg b">Proposal</span></td><td>$4,200</td><td>Follow-up call this week</td></tr>
-<tr><td>Lena Fischer</td><td><span class="bdg b">Proposal</span></td><td>$3,500</td><td>Send agreement</td></tr>
-<tr><td>Daniel Osei</td><td><span class="bdg b">Nurture</span></td><td>$3,800</td><td>Value email sequence</td></tr>
-<tr><td>Nina Patel</td><td><span class="bdg b">Nurture</span></td><td>$3,200</td><td>Case study follow-up</td></tr>
-<tr><td>Tyler Brooks</td><td><span class="bdg b">Nurture</span></td><td>$2,800</td><td>Re-engage in 2 weeks</td></tr>
-</table>
-</div>
-
-<div id="cp" class="panel">
-<div style="max-width:800px">
-<div class="kpi y" style="margin-bottom:16px"><div class="lbl">Priority Focus This Week</div><div class="val" style="font-size:16px;margin-top:6px">Ask for the deposit on EVERY call</div><div class="sub">Current rate: 21% — Target: 100%</div></div>
-<table>
-<tr><th>Area</th><th>Current</th><th>Target</th><th>Action</th></tr>
-<tr><td>Deposit Ask Rate</td><td><span class="bdg r">21%</span></td><td>100%</td><td>Script the ask at minute 45 of every call</td></tr>
-<tr><td>Close Ask Rate</td><td><span class="bdg y">43%</span></td><td>80%+</td><td>Always ask "are you ready to move forward?" before ending</td></tr>
-<tr><td>LBs Per Call</td><td><span class="bdg r">14.3</span></td><td>&lt;10</td><td>Qualify harder in first 10 min, disqualify faster</td></tr>
-<tr><td>Avg Call Score</td><td><span class="bdg y">54/100</span></td><td>70+</td><td>Review Rachel Kim call as gold standard</td></tr>
-<tr><td>Objection Handling</td><td><span class="bdg r">38%</span></td><td>70%+</td><td>Practice price reframe daily — most common killer</td></tr>
-</table>
-</div>
-</div>
-</div>
-</div>
-
-<script>
-function S(id){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  event.target.classList.add('active');
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  renderTab(id);
 }
-window.addEventListener('load',function(){
-  var sc=document.getElementById('scoreChart');
-  var lc=document.getElementById('lbChart');
-  if(sc&&lc){
-    new Chart(sc,{type:'bar',data:{labels:['36-45','46-55','56-65','66-75'],datasets:[{label:'Calls',data:[4,3,4,3],backgroundColor:['#f85149','#d29922','#58a6ff','#3fb950']}]},options:{plugins:{legend:{display:false}},scales:{y:{ticks:{color:'#8b949e'},grid:{color:'#30363d'}},x:{ticks:{color:'#8b949e'},grid:{color:'#30363d'}}}}});
-    new Chart(lc,{type:'doughnut',data:{labels:['Price','Not Ready','Won\'t Work','Spouse','Past Exp','Timing'],datasets:[{data:[11,9,8,7,6,5],backgroundColor:['#f85149','#d29922','#58a6ff','#bc8cff','#ffa657','#3fb950']}]},options:{plugins:{legend:{labels:{color:'#8b949e',font:{size:11}}}}}});
-  }
-});
+
+const rendered = {};
+function renderTab(id) {
+  if(rendered[id]) return;
+  rendered[id] = true;
+  if(id==='overview') renderOverview();
+  if(id==='calls') renderCalls();
+  if(id==='lb') renderLB();
+  if(id==='objections') renderObjTab();
+  if(id==='deposit') renderDeposit();
+  if(id==='icp') renderICP();
+  if(id==='scoring') renderScoring();
+}
+
+function scoreColor(s) { return s>=65?'#22c55e':s>=50?'#f59e0b':'#ef4444'; }
+function talkColor(t) { return (t>=40&&t<=55)?'#22c55e':(t>=35&&t<=65)?'#f59e0b':'#ef4444'; }
+function lbColor(lb) { return lb<10?'#22c55e':lb<25?'#f59e0b':'#ef4444'; }
+function lbClass(lb) { return lb<10?'green':lb<25?'yellow':'red'; }
+
+function renderOverview() {
+  const labels = CALLS.map(c => c.prospect.split(' ')[0] + ' ' + c.date.slice(5));
+  const scores = CALLS.map(c => c.call_score);
+  const lbs = CALLS.map(c => c.lb_count);
+  const target10 = Array(lbs.length).fill(10);
+
+  new Chart(document.getElementById('scoreChart'), {
+    type:'line', data:{labels, datasets:[{
+      label:'Score', data:scores, borderColor:'#3b82f6',
+      backgroundColor:'rgba(59,130,246,0.1)', tension:0.3,
+      pointBackgroundColor:scores.map(scoreColor), pointRadius:6, fill:true
+    }]},
+    options:{responsive:true, plugins:{legend:{display:false}},
+      scales:{y:{min:0,max:100,grid:{color:'#1e293b'},ticks:{color:'#64748b'}},
+              x:{ticks:{color:'#64748b',maxRotation:45}}}}
+  });
+
+  new Chart(document.getElementById('lbChart'), {
+    type:'bar', data:{labels, datasets:[
+      {label:'LB Count', data:lbs, backgroundColor:lbs.map(lbColor)},
+      {label:'Target <10', data:target10, type:'line', borderColor:'#22c55e',
+       borderDash:[5,5], pointRadius:0, borderWidth:2}
+    ]},
+    options:{responsive:true, plugins:{legend:{labels:{color:'#64748b'}}},
+      scales:{y:{grid:{color:'#1e293b'},ticks:{color:'#64748b'}},
+              x:{ticks:{color:'#64748b',maxRotation:45}}}}
+  });
+
+  const outKeys = Object.keys(OUTCOMES), outVals = Object.values(OUTCOMES);
+  new Chart(document.getElementById('outcomeChart'), {
+    type:'doughnut', data:{labels:outKeys,
+      datasets:[{data:outVals, backgroundColor:COLORS, borderColor:'#0f1117', borderWidth:2}]},
+    options:{responsive:true, plugins:{legend:{position:'right',labels:{color:'#94a3b8',boxWidth:12}}}}
+  });
+
+  const catKeys = Object.keys(LB_CATS).map(k=>k.replace(/_/g,' '));
+  const catVals = Object.values(LB_CATS);
+  new Chart(document.getElementById('lbCatChart'), {
+    type:'bar', data:{labels:catKeys, datasets:[{data:catVals, backgroundColor:COLORS}]},
+    options:{responsive:true, indexAxis:'y', plugins:{legend:{display:false}},
+      scales:{x:{grid:{color:'#1e293b'},ticks:{color:'#64748b'}}, y:{ticks:{color:'#64748b'}}}}
+  });
+}
+
+function renderCalls() {
+  const tb = document.getElementById('callsBody');
+  tb.innerHTML = CALLS.map((c,i) => {
+    const depBadge = c.deposit_asked ? '<span class="badge green">YES</span>' : '<span class="badge red">NO</span>';
+    const closeBadge = c.close_asked ? '<span class="badge green">YES</span>' : '<span class="badge red">NO</span>';
+    const lbQuotes = (c.top_lb_quotes||[]).map(q =>
+      '<li><div class="quote">"' + q.quote + '"</div><small style="color:#64748b">' + q.category.replace(/_/g,' ') + '</small></li>'
+    ).join('') || '<li style="color:#64748b">None captured</li>';
+    const depContent = c.deposit_asked
+      ? '<p style="color:#22c55e">YES</p><div class="quote">"' + (c.deposit_quote||'Quote unavailable') + '"</div>'
+      : '<p style="color:#ef4444">NOT ASKED</p><p style="color:#64748b;font-size:12px">Missed opportunity — call ended without a deposit ask.</p>';
+    const overview = c.overview ? '<div style="margin-top:12px;background:#0f1117;border-radius:8px;padding:12px"><p style="font-size:12px;color:#64748b">SUMMARY: ' + c.overview + '</p></div>' : '';
+    const ffLink = c.fireflies_url ? '<div style="margin-top:8px"><a href="' + c.fireflies_url + '" target="_blank" style="color:#3b82f6;font-size:12px">View in Fireflies &rarr;</a></div>' : '';
+    return `
+    <tr id="row-${i}" onclick="toggleExpand(${i})">
+      <td>${c.date}</td>
+      <td><strong>${c.prospect}</strong></td>
+      <td>${c.duration}m</td>
+      <td><span class="badge" style="background:${scoreColor(c.call_score)}22;color:${scoreColor(c.call_score)}">${c.call_score}</span></td>
+      <td><span class="badge ${lbClass(c.lb_count)}">${c.lb_count}</span></td>
+      <td style="color:${talkColor(c.talk_ratio)}">${c.talk_ratio}%</td>
+      <td>${depBadge}</td><td>${closeBadge}</td>
+      <td><span class="badge blue">${c.icp_score}/10</span></td>
+      <td style="font-size:12px;color:#94a3b8">${c.why_not_closed}</td>
+    </tr>
+    <tr id="expand-${i}" class="expand-row"><td colspan="10">
+      <div class="expand-grid">
+        <div class="expand-card"><h4>Scores</h4>
+          <p>Overall: ${c.call_score}/100</p><p>ICP: ${c.icp_score}/10</p>
+          <p>Talk ratio: ${c.talk_ratio}% (target 40-55%)</p><p>LBs: ${c.lb_count} (target &lt;10)</p>
+        </div>
+        <div class="expand-card"><h4>Top Limiting Beliefs</h4><ul>${lbQuotes}</ul></div>
+        <div class="expand-card"><h4>Deposit Ask</h4>${depContent}
+          <div style="margin-top:8px"><h4>Close Ask</h4>${c.close_asked ? '<p style="color:#22c55e">YES</p>' : '<p style="color:#ef4444">NOT ASKED</p>'}</div>
+        </div>
+      </div>${overview}${ffLink}
+    </td></tr>`;
+  }).join('');
+}
+
+function toggleExpand(i) {
+  const r = document.getElementById('expand-' + i);
+  const row = document.getElementById('row-' + i);
+  const isOpen = r.classList.contains('open');
+  document.querySelectorAll('.expand-row').forEach(x => x.classList.remove('open'));
+  document.querySelectorAll('tbody tr:not(.expand-row)').forEach(x => x.classList.remove('expanded'));
+  if(!isOpen) { r.classList.add('open'); row.classList.add('expanded'); }
+}
+
+let sortDir = {};
+function sortTable(col) {
+  const tb = document.getElementById('callsBody');
+  const rows = Array.from(tb.querySelectorAll('tr:not(.expand-row)'));
+  sortDir[col] = !sortDir[col];
+  rows.sort((a,b) => {
+    const av = a.cells[col] ? a.cells[col].textContent.trim() : '';
+    const bv = b.cells[col] ? b.cells[col].textContent.trim() : '';
+    const an = parseFloat(av), bn = parseFloat(bv);
+    if(!isNaN(an) && !isNaN(bn)) return sortDir[col] ? an-bn : bn-an;
+    return sortDir[col] ? av.localeCompare(bv) : bv.localeCompare(av);
+  });
+  rows.forEach(r => { tb.appendChild(r); const exp = document.getElementById('expand-' + r.id.split('-')[1]); if(exp) tb.appendChild(exp); });
+}
+
+function renderLB() {
+  const labels = CALLS.map(c => c.prospect.split(' ')[0]);
+  const lbs = CALLS.map(c => c.lb_count);
+  const catKeys = Object.keys(LB_CATS).map(k => k.replace(/_/g,' '));
+  const catVals = Object.values(LB_CATS);
+
+  new Chart(document.getElementById('lbCatDeep'), {
+    type:'bar', data:{labels:catKeys, datasets:[{data:catVals, backgroundColor:COLORS}]},
+    options:{responsive:true, indexAxis:'y', plugins:{legend:{display:false}},
+      scales:{x:{grid:{color:'#1e293b'},ticks:{color:'#64748b'}}, y:{ticks:{color:'#64748b'}}}}
+  });
+  new Chart(document.getElementById('lbPerCall'), {
+    type:'bar', data:{labels, datasets:[
+      {label:'LB Count', data:lbs, backgroundColor:lbs.map(lbColor)},
+      {label:'Target', data:Array(lbs.length).fill(10), type:'line', borderColor:'#22c55e', borderDash:[5,5], pointRadius:0}
+    ]},
+    options:{responsive:true, plugins:{legend:{labels:{color:'#64748b'}}},
+      scales:{y:{grid:{color:'#1e293b'},ticks:{color:'#64748b'}}, x:{ticks:{color:'#64748b'}}}}
+  });
+
+  const catInfo = {
+    hedge_language:{title:'Hedge Language',desc:'Weakens claims with "I think", "maybe", "kind of", "probably"',fix:'Replace with declarative statements. "Apex does X" not "Apex kind of helps with X."'},
+    permission_seeking:{title:'Permission Seeking',desc:'"Does that make sense?" signals low conviction, trains prospect to evaluate not decide',fix:'Replace with "So now you can see why [pain] stops being a problem. What questions do you have?"'},
+    weak_qualifiers:{title:'Weak Qualifiers',desc:'Filler language that signals anxiety and undermines authority',fix:'Record calls and flag every "um", "like", "you know." Eliminate through daily practice.'},
+    validation_seeking:{title:'Validation Seeking',desc:'Circling back to check if prospect is engaged reveals insecurity',fix:'Trust the silence. Ask one question, then wait the full 8 seconds.'},
+    weak_close:{title:'Weak Close Language',desc:'"Whenever you're ready", "no pressure" gives prospect permission to defer forever',fix:'"Are you ready to get started today?" Then hold silence — do not speak first.'},
+    premature_exit:{title:'Premature Exit',desc:'Wrapping up before the deposit ask ends the call before the ask',fix:'Never close a call without a deposit ask. Non-negotiable.'},
+    value_undermining:{title:'Value Undermining',desc:'"We basically..." or "we kind of..." undersells the product',fix:'Own the value: "Apex automates X, generates Y, saves Z hours/week."'},
+    price_anxiety:{title:'Price Anxiety',desc:'Apologizing for or softening the price destroys the frame',fix:'State price flat: "$25,000 per year. $5,000 deposit to start." Same confidence as your name.'},
+    worthiness_doubt:{title:'Worthiness Doubt',desc:'"We're still growing" signals Apex isn't ready — destroys prospect confidence',fix:'Never qualify the company downward. Use a client win: "We just helped [client] do [result]."'}
+  };
+
+  const total = Object.values(LB_CATS).reduce((a,b)=>a+b,0);
+  document.getElementById('lbCategoryCards').innerHTML = Object.entries(catInfo).map(([k,v]) => {
+    const count = LB_CATS[k] || 0;
+    const pct = total > 0 ? Math.round(count/total*100) : 0;
+    const cls = count>20?'red':count>10?'yellow':'green';
+    return `<div class="expand-card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <h4>${v.title}</h4>
+        <span class="badge ${cls}">${count} instances (${pct}%)</span>
+      </div>
+      <p style="margin-bottom:6px"><strong style="color:#94a3b8">Pattern:</strong> ${v.desc}</p>
+      <p><strong style="color:#22c55e">Kind Warrior fix:</strong> ${v.fix}</p>
+    </div>`;
+  }).join('');
+}
+
+function renderObjTab() {
+  const allObjs = CALLS.flatMap(c => (c.objections||[]).map(o => Object.assign({}, o, {prospect:c.prospect, date:c.date})));
+  const typeCount = {};
+  allObjs.forEach(o => typeCount[o.type] = (typeCount[o.type]||0) + 1);
+
+  new Chart(document.getElementById('objFreqChart'), {
+    type:'bar', data:{labels:Object.keys(typeCount), datasets:[{data:Object.values(typeCount), backgroundColor:COLORS}]},
+    options:{responsive:true, plugins:{legend:{display:false}},
+      scales:{y:{grid:{color:'#1e293b'},ticks:{color:'#64748b'}}, x:{ticks:{color:'#64748b'}}}}
+  });
+  new Chart(document.getElementById('objQualChart'), {
+    type:'doughnut', data:{labels:['Strong','Adequate','Weak','Missed'],
+      datasets:[{data:[2,4,8,6], backgroundColor:['#22c55e','#3b82f6','#f59e0b','#ef4444'], borderColor:'#0f1117', borderWidth:2}]},
+    options:{responsive:true, plugins:{legend:{position:'right',labels:{color:'#94a3b8'}}}}
+  });
+
+  const kwReplies = {
+    price:'Reframe: "What's it costing you to handle this manually right now?" Quantify: "20hrs/week x $75/hr = $78K/year." Ask: "The deposit to start is $5,000 today."',
+    timing:'Reframe: "What specifically needs to change before this makes sense?" Quantify: "Every month you wait is another [X cost]." Ask: "What if we start now?"',
+    authority:'Reframe: "What would you want to discuss with them?" Schedule a 3-way call this week. State: "We only onboard a few clients/month — let's hold your spot."',
+    trust:'Reframe: "What would you need to see to feel confident?" Social proof: "Last month, [client] saw [result] in week 2." Ask: "Would a 30-day review give you confidence?"'
+  };
+
+  document.getElementById('objTable').innerHTML = `
+    <h2 class="section-title">Kind Warrior Playbook for Top Objections</h2>
+    ${Object.entries(kwReplies).map(([type,reply]) => `
+      <div class="expand-card" style="margin-bottom:12px">
+        <h4 style="text-transform:capitalize">${type} Objection &mdash; ${typeCount[type]||0} occurrences</h4>
+        <div class="script-card"><div class="label good">Kind Warrior Response</div><div class="good">${reply}</div></div>
+      </div>`).join('')}
+    <h2 class="section-title" style="margin-top:16px">All Objections Raised</h2>
+    <table><thead><tr><th>Prospect</th><th>Date</th><th>Type</th><th>Objection</th></tr></thead>
+    <tbody>${allObjs.map(o => `<tr><td>${o.prospect}</td><td>${o.date}</td><td><span class="badge blue">${o.type}</span></td><td style="font-size:12px">${o.quote}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function renderDeposit() {
+  const asked = CALLS.filter(c => c.deposit_asked);
+  const notAsked = CALLS.filter(c => !c.deposit_asked);
+  document.getElementById('depositTable').innerHTML = `
+    <h2 class="section-title">Calls With Deposit Ask (${asked.length}/${CALLS.length})</h2>
+    <table style="margin-bottom:24px"><thead><tr><th>Prospect</th><th>Date</th><th>ICP</th><th>Deposit Quote</th><th>Status</th></tr></thead>
+    <tbody>${asked.map(c => `<tr><td><strong>${c.prospect}</strong></td><td>${c.date}</td>
+      <td><span class="badge blue">${c.icp_score}/10</span></td>
+      <td><div class="quote" style="max-width:300px">"${c.deposit_quote||'Quote not captured'}"</div></td>
+      <td><span class="badge ${c.pipeline_status==='Closed Won'?'green':'yellow'}">${c.pipeline_status}</span></td></tr>`).join('')}</tbody></table>
+    <h2 class="section-title" style="color:#ef4444">Calls With NO Deposit Ask (${notAsked.length}/${CALLS.length}) &#128308;</h2>
+    <table><thead><tr><th>Prospect</th><th>Date</th><th>ICP</th><th>Why No Ask</th><th>Next Action</th></tr></thead>
+    <tbody>${notAsked.map(c => `<tr><td><strong>${c.prospect}</strong></td><td>${c.date}</td>
+      <td><span class="badge ${c.icp_score>=7?'blue':'gray'}">${c.icp_score}/10</span></td>
+      <td style="color:#f59e0b;font-size:12px">${c.why_not_closed}</td>
+      <td style="color:#3b82f6;font-size:12px">${c.icp_score>=7?'Re-engage with direct deposit ask':'Qualify further'}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function renderICP() {
+  const dist = {};
+  CALLS.forEach(c => { const s = String(c.icp_score); dist[s] = (dist[s]||0) + 1; });
+  const dKeys = Object.keys(dist).sort(), dVals = dKeys.map(k => dist[k]);
+
+  new Chart(document.getElementById('icpDistChart'), {
+    type:'bar', data:{labels:dKeys.map(k=>k+'/10'), datasets:[{data:dVals, backgroundColor:'#3b82f6'}]},
+    options:{responsive:true, plugins:{legend:{display:false}},
+      scales:{y:{grid:{color:'#1e293b'},ticks:{color:'#64748b'}}, x:{ticks:{color:'#64748b'}}}}
+  });
+
+  const pl = {};
+  CALLS.forEach(c => pl[c.pipeline_status] = (pl[c.pipeline_status]||0) + 1);
+  new Chart(document.getElementById('pipelineChart'), {
+    type:'doughnut', data:{labels:Object.keys(pl), datasets:[{data:Object.values(pl), backgroundColor:COLORS, borderColor:'#0f1117', borderWidth:2}]},
+    options:{responsive:true, plugins:{legend:{position:'right',labels:{color:'#94a3b8'}}}}
+  });
+
+  const sorted = [...CALLS].sort((a,b) => b.icp_score - a.icp_score);
+  document.getElementById('icpTable').innerHTML = `
+    <h2 class="section-title">All Prospects by ICP Score</h2>
+    <table><thead><tr><th>Prospect</th><th>Date</th><th>ICP</th><th>Pipeline</th><th>Duration</th><th>Deposit?</th><th>Recommended Action</th></tr></thead>
+    <tbody>${sorted.map(c => {
+      const action = c.icp_score>=7&&!c.deposit_asked ? '&#128308; Re-engage with deposit ask' : c.icp_score>=7&&c.deposit_asked ? '&#127841; Follow up on deposit' : c.icp_score<6 ? '&#9898; Low priority' : '&#128994; Active';
+      return `<tr><td><strong>${c.prospect}</strong></td><td>${c.date}</td>
+        <td><span class="badge ${c.icp_score>=8?'green':c.icp_score>=6?'blue':'gray'}">${c.icp_score}/10</span></td>
+        <td><span class="badge ${c.pipeline_status==='Closed Won'?'green':c.pipeline_status==='Hot'?'yellow':'gray'}">${c.pipeline_status}</span></td>
+        <td>${c.duration}m</td><td>${c.deposit_asked?'&#10003;':'&#10007;'}</td>
+        <td style="font-size:12px;color:#3b82f6">${action}</td></tr>`;
+    }).join('')}</tbody></table>`;
+}
+
+function renderScoring() {
+  const sorted = [...CALLS].sort((a,b) => b.call_score - a.call_score);
+  const labels = sorted.map(c => c.prospect.split(' ')[0]);
+  const scores = sorted.map(c => c.call_score);
+
+  new Chart(document.getElementById('leaderboardChart'), {
+    type:'bar', data:{labels, datasets:[{label:'Score', data:scores, backgroundColor:scores.map(scoreColor)}]},
+    options:{responsive:true, plugins:{legend:{display:false}},
+      scales:{y:{min:0,max:100,grid:{color:'#1e293b'},ticks:{color:'#64748b'}}, x:{ticks:{color:'#64748b'}}}}
+  });
+
+  document.getElementById('scoringTable').innerHTML = `
+    <h2 class="section-title">Full Leaderboard</h2>
+    <table><thead><tr><th>Rank</th><th>Prospect</th><th>Date</th><th>Score</th><th>LBs</th><th>Talk%</th><th>Deposit</th><th>Close</th><th>ICP</th></tr></thead>
+    <tbody>${sorted.map((c,i) => `<tr>
+      <td style="color:#64748b">#${i+1}</td><td><strong>${c.prospect}</strong></td><td>${c.date}</td>
+      <td><span class="badge" style="background:${scoreColor(c.call_score)}22;color:${scoreColor(c.call_score)};font-size:14px">${c.call_score}</span></td>
+      <td><span class="badge ${lbClass(c.lb_count)}">${c.lb_count}</span></td>
+      <td style="color:${talkColor(c.talk_ratio)}">${c.talk_ratio}%</td>
+      <td>${c.deposit_asked?'&#10003;':'&#10007;'}</td>
+      <td>${c.close_asked?'&#10003;':'&#10007;'}</td>
+      <td>${c.icp_score}/10</td></tr>`).join('')}
+    </tbody></table>`;
+}
+
+document.addEventListener('DOMContentLoaded', () => renderOverview());
 </script>
-</body></html>
+</body>
+</html>
