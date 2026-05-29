@@ -98,8 +98,8 @@ const metrics = {
 };
 
 // Write processed data
-fs.writeFileSync(path.join(__dirname, '../data/metrics.json'), JSON.stringify(metrics, null, 2));
-fs.writeFileSync(path.join(__dirname, '../data/processed-calls.json'), JSON.stringify(processed, null, 2));
+fs.writeFileSync(path.join(__dirname, '../public/metrics.json'), JSON.stringify(metrics, null, 2));
+fs.writeFileSync(path.join(__dirname, '../public/processed-calls.json'), JSON.stringify(processed, null, 2));
 
 console.log(`✓ Processed ${processed.length} calls`);
 console.log(`  Avg Score: ${metrics.avgScore}/100`);
