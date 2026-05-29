@@ -905,7 +905,7 @@ let CHART_ICP = [], SCORE_DIST = [], CAT_LABELS = [], CAT_VALUES = [];
 let OUTCOME_LABELS = [], OUTCOME_VALUES = [], ICP_SCORES = [], ICP_CALL_SCORES = [];
 let TR_DIST = [], TR_BAR_COLORS = [];
 
-fetch('/data/metrics.json')
+fetch('/api/metrics')
   .then(r => r.json())
   .then(m => {
     console.log(`Loaded metrics for ${m.totalCalls} calls`);
